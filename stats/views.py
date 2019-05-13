@@ -3,14 +3,19 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 from django.views import View
 import csv
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import pytz
 from collections import defaultdict
 
 # Create your views here.
+def convert_datestring_to_dateobj(datestring):
+    return datetime.strptime(datestring, "%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+
+
 class IndexView(View):
     def get(self, request):
         return render(request, 'stats/main.html', {})
+
 
 class ChartView(View):
     def is_recent(self, date, now, day_range):
@@ -23,6 +28,18 @@ class ChartView(View):
         assert(len(list_storage) == len(list_add_value))
         for idx, value in enumerate(list_add_value):
             list_storage[idx] += int(value)
+
+    def get_recent_stats(self, most_recent_data):
+        age = int((datetime.now(pytz.utc) - convert_datestring_to_dateobj(most_recent_data[0])) / timedelta(minutes=1))
+        recent = {
+            'age': age,
+            '1v1m': most_recent_data[1],
+            '1v1q': most_recent_data[2],
+            'FFAm': most_recent_data[3],
+            'FFAq': most_recent_data[4]
+        }
+        return recent
+
 
     def analyze_data(self, mode, days, tz):
         if mode == 'all': get_all = True
@@ -54,7 +71,7 @@ class ChartView(View):
                 time_raw = item[0]
 
                 #timezone conversion
-                time_utc = datetime.strptime(time_raw, "%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+                time_utc = convert_datestring_to_dateobj(time_raw)
                 time_loc = time_utc.astimezone(tz=local_zone)
 
                 loc_day = time_loc.weekday()
@@ -82,8 +99,9 @@ class ChartView(View):
                 else:
                     print('nothing')
 
+            result['recent'] = self.get_recent_stats(item)
+            return result
 
-        return result
 
     def get(self, request, mode='all', days=30, tz='UTC'):
         data = self.analyze_data(mode, days, tz)
