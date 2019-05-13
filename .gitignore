@@ -1,4 +1,5 @@
 settings.py
+stats/migrations/*
 *.kra
 *.kra~
 db.sqlite3
