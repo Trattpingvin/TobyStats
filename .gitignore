@@ -1,0 +1,4 @@
+settings.py
+*.kra
+*.kra~
+db.sqlite3
