@@ -1,0 +1,38 @@
+<canvas id="canvas-time"></canvas>
+<script>
+    var ctx_time = document.getElementById('canvas-time').getContext('2d');
+    var timeFormat = "YYYY-MM-DD HH:mm:ss";
+    var emptytime = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    window.time_data = {
+        labels: [...Array(24).keys()],
+        datasets: [
+            {
+                label: '1v1',
+                borderColor: window.chartColors.red,
+                fill: false,
+                data: emptytime
+            },
+            {
+                label: 'FFA',
+                borderColor: window.chartColors.blue,
+                fill: false,
+                data: emptytime
+            },
+        ]
+    }
+    window.time_chart = new Chart(ctx_time, {
+        type: 'line',
+        data: window.time_data,
+        options: {
+            title: {
+                display: true,
+                text: 'Matches per hour'
+            },
+            tooltips: {
+                mode: 'nearest',
+                intersect: 'false'
+            },
+            responsive: true,
+        }
+    });
+</script>

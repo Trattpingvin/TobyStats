@@ -1,0 +1,63 @@
+<!-- div section toby -->
+<div class="refresh" role="button">
+    <div id="refresh"></div>
+    Refresh Data
+</div>
+<div class="icon" role="img"></div>
+<div class="bubble">
+    <table>
+        <thead>
+            <tr>
+                <td class="title" colspan="2">
+                    Greetings, traveler!<br />
+                    Here's the match status.
+                </td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <!-- No one is waiting in queue. -->
+                    There are <span class="numbers">13 players</span>
+                    in <span class="type">1v1</span> queue<br />
+                    and <span class="numbers">31 players</span>
+                    in <span class="type">FFA</span> queue.
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <!-- There are no matches going on right now.-->
+                    Currently there are <span class="numbers">2</span> <span class="type">1v1</span> matches<br />
+                    and <span class="numbers">11</span> <span class="type">FFA</span> matches going on.
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="extra">
+        *this status is based on the query made 9 minutes ago*
+    </div>
+</div>
+
+<script>
+    function update_data(total, days, tz) {
+        let getUrl = "{% url 'tobystats:getdata' %}" + total + "/" + days + "/" + tz;
+        $.get(getUrl, function(django_data) {
+            window.chart_data = django_data;
+            window.day_data.datasets[0].data = window.chart_data['freq']['1v1'];
+            window.day_data.datasets[1].data = window.chart_data['freq']['FFA'];
+            window.time_data.datasets[0].data = window.chart_data['time']['1v1'];
+            window.time_data.datasets[1].data = window.chart_data['time']['FFA'];
+
+            window.day_chart.update();
+            window.time_chart.update();
+        });
+    };
+
+    document.getElementById('refresh').addEventListener('click', function() {
+        update_data('all', 30, 'UTC');
+    });
+
+    window.onload = function() {
+        update_data('all', 30, 'UTC');
+    };
+</script>

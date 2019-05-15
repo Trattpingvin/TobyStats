@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'stats/css/common.css' %}">
+<link rel="shortcut icon" href="{% static 'stats/img/Toby-green.png' %}">
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="{% static 'stats/scripts/utils.js'%}"></script>
+
+<html>
+    <head>
+        <title>{% block title %}Toby -- Offworld Ranked Match Stats{% endblock title %}</title>
+    </head>
+    <body>
+        <header>
+            <h1>Offworld Ranked Match Stats</h1>
+        </header>
+        <main>
+            {% block main %}{% endblock main %}
+        </main>
+        <footer>
+            <h2>Website designed by <a href="https://github.com/Rhahi">Rhahi</a> and <a href="https://github.com/Trattpingvin/">Trattpingvin</a></h2>
+        </footer>
+    </body>
+</html>
