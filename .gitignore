@@ -1,5 +1,6 @@
 settings.py
 stats/migrations/*
+*.log
 *.kra
 *.kra~
 db.sqlite3
