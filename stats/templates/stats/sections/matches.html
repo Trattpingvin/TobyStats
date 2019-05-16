@@ -1,9 +1,22 @@
 
 <canvas id="canvas-matches"></canvas>
+<button onclick="resetZoom()">Reset Zoom</button>
+<button id="drag-switch" onclick="toggleDragMode()">Disable drag mode</button>
 <script type="text/javascript">
+	window.resetZoom = function() {
+		window.matchesGraph.resetZoom();
+	};
+	window.toggleDragMode = function() {
+		var chart = window.matchesGraph;
+		var zoomOptions = chart.options.plugins.zoom.zoom;
+		zoomOptions.drag = !zoomOptions.drag;
+		chart.update();
+		document.getElementById('drag-switch').innerText = zoomOptions.drag ? 'Disable drag mode' : 'Enable drag mode';
+	};
+
 	function buildMatchesGraph(data){
 		var canvascontext = document.getElementById('canvas-matches').getContext('2d');
-		var graph = new Chart(canvascontext, {
+		window.matchesGraph = new Chart(canvascontext, {
 			type: 'line',
 			data: {
 				labels: [new Date(Date.now()-30*24*60*60*1000), new Date()],
