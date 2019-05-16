@@ -19,7 +19,7 @@ class IndexView(View):
 
 class ChartView(View):
     def is_recent(self, date, now, day_range):
-        delta = (now - date).days
+        delta = (now - date) / timedelta(days=1)
         if delta >= 0 and delta < day_range:
             return True
         return False
@@ -40,6 +40,12 @@ class ChartView(View):
         }
         return recent
 
+    def get_average(self, resolution, start_time, end_time):
+        now = datetime.now(pytz.utc)
+        if resolution<timedelta(minutes=5):
+            return HttpResponse("Resolution lower than 5 minutes not supported")
+        if end_time > now:
+            end_time = now
 
     def analyze_data(self, mode, days, tz):
         if mode == 'all': get_all = True

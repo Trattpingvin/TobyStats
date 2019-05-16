@@ -1,5 +1,63 @@
-<!-- this part should have timezone and range selector 
-    user choose options, hit apply, which will refresh all the carts.
-    default is "partial", 30, "UTC"
-    can choose "all", <int>, "US/Eastern" "US/Central" EST and stuff.
--->
+
+<canvas id="canvas-matches"></canvas>
+<script type="text/javascript">
+	function buildMatchesGraph(data){
+		var canvascontext = document.getElementById('canvas-matches').getContext('2d');
+		var graph = new Chart(canvascontext, {
+			type: 'line',
+			data: {
+				labels: [new Date(Date.now()-30*24*60*60*1000), new Date()],
+				datasets: [{
+					label: '1v1',
+					data: data['time']['1v1'],
+					fill: false,
+					borderDash: [5, 5],
+				}, {
+					label: 'FFA',
+					data: data['time']['FFA'],
+				}]
+			},
+			options: {
+				responsive: true,
+				title: {
+					display: true,
+					text: 'Offworld ranked history'
+				},
+				scales: {
+					xAxes: [{
+						type: 'time',
+						time: {
+							parser: timeFormat,
+							// round: 'day'
+							tooltipFormat: 'll HH:mm'
+						},
+						scaleLabel: {
+							display: true,
+							labelString: 'Date'
+						},
+						ticks: {
+							maxRotation: 0
+						}
+					}],
+					yAxes: [{
+						scaleLabel: {
+							display: true,
+							labelString: 'value'
+						}
+					}]
+				},
+				plugins: {
+					zoom: {
+						zoom: {
+							enabled: true,
+							drag: true,
+							mode: 'x',
+							speed: 0.05
+						}
+					}
+				}
+			}
+		});
+	}
+
+</script>

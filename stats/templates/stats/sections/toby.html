@@ -55,6 +55,7 @@
             $("#FFAq").html(django_data['recent']['FFAq']);
             $("#FFAm").html(django_data['recent']['FFAm']);
             $("#query_age").html(django_data['recent']['age']);
+            buildMatchesGraph(django_data);
         });
     };
 
