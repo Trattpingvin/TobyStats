@@ -34,7 +34,7 @@ class ChartView(View):
             '1v1m': [],
             '1v1q': [],
             'ffam': [],
-            'ffaq': [],
+            'ffaq': []
         }
         with open('stats/data/rankedhistory.log', newline='') as f:
             now = datetime.now(pytz.utc)
@@ -48,13 +48,13 @@ class ChartView(View):
                 time_utc = convert_datestring_to_dateobj(time_raw)
                 time_loc = time_utc.astimezone(tz=local_zone)
 
-                result['1v1m'].append({'time': str(time_loc), 'val': item[1]})
-                result['1v1q'].append({'time': str(time_loc), 'val': item[2]})
-                result['ffam'].append({'time': str(time_loc), 'val': item[3]})
-                result['ffaq'].append({'time': str(time_loc), 'val': item[4]})
+                result['1v1m'].append({'time': str(time_loc)[0:-6], 'val': item[1]})
+                result['1v1q'].append({'time': str(time_loc)[0:-6], 'val': item[2]})
+                result['ffam'].append({'time': str(time_loc)[0:-6], 'val': item[3]})
+                result['ffaq'].append({'time': str(time_loc)[0:-6], 'val': item[4]})
 
             result['recent'] = self.get_recent_stats(item)
-            print(item)
+            print(result['ffam'][0]['time'])
             return result
 
 

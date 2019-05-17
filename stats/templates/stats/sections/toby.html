@@ -20,7 +20,7 @@
                     <!-- No one is waiting in queue. -->
                     There are <span class="numbers" id="1v1q">x</span> players
                     in <span class="type">1v1</span> queue<br />
-                    and <span class="numbers" id="FFAq">y</span> players
+                    and <span class="numbers" id="ffaq">y</span> players
                     in <span class="type">FFA</span> queue.
                 </td>
             </tr>
@@ -28,7 +28,7 @@
                 <td>
                     <!-- There are no matches going on right now.-->
                     Currently there are <span class="numbers" id="1v1m">v</span> <span class="type">1v1</span> matches<br />
-                    and <span class="numbers" id="FFAm">w</span> <span class="type">FFA</span> matches going on.
+                    and <span class="numbers" id="ffam">w</span> <span class="type">FFA</span> matches going on.
                 </td>
             </tr>
         </tbody>
@@ -42,11 +42,10 @@
     function update_data(tz) {
         let getUrl = "{% url 'tobystats:getdata' %}" + tz;
         $.get(getUrl, function(django_data) {
-            console.log(django_data)
             $("#1v1q").html(django_data['recent']['1v1q']);
             $("#1v1m").html(django_data['recent']['1v1m']);
-            $("#ffaq").html(django_data['recent']['FFAq']);
-            $("#ffam").html(django_data['recent']['FFAm']);
+            $("#ffaq").html(django_data['recent']['ffaq']);
+            $("#ffam").html(django_data['recent']['ffam']);
             $("#query_age").html(django_data['recent']['age']);
             createGraph(django_data);
         });

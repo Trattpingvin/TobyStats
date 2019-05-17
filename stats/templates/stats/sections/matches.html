@@ -70,14 +70,12 @@
 	.attr("class", "context")
 	.attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
 
-	function createGraph(data) {
-		data = data['ffam']
-		console.log(data);
+	function createGraph(in_data) {
+		data = in_data['ffam']
 		data.map(d => {
 			d.time = parseDate(d.time);
 			d.val = +d.val;
 		});
-		console.log(data);
 		x.domain(d3.extent(data, function(d) { return d.time; }));
 		y.domain([0, d3.max(data, function(d) { return d.val; })]);
 		x2.domain(x.domain());
