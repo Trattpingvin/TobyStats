@@ -16,25 +16,20 @@
         </thead>
         <tbody>
             <tr>
-                <td>
+                <td id="speech-bubble-queue">
                     <!-- No one is waiting in queue. -->
-                    There are <span class="numbers" id="1v1q">x</span> players
-                    in <span class="type">1v1</span> queue<br />
-                    and <span class="numbers" id="ffaq">y</span> players
-                    in <span class="type">FFA</span> queue.
+                    Please wait, I am digging up the data...
                 </td>
             </tr>
             <tr>
-                <td>
+                <td id="speech-bubble-matches">
                     <!-- There are no matches going on right now.-->
-                    Currently there are <span class="numbers" id="1v1m">v</span> <span class="type">1v1</span> matches<br />
-                    and <span class="numbers" id="ffam">w</span> <span class="type">FFA</span> matches going on.
                 </td>
             </tr>
         </tbody>
     </table>
-    <div class="extra">
-        *this status is based on the query made <span id="query_age">z</span> minutes ago*
+    <div class="extra" id="speech-bubble-time">
+        *
     </div>
 </div>
 
@@ -55,10 +50,28 @@
                 }
             }
             window.graph_data = django_data;
-            $("#1v1q").html(django_data['recent']['1v1q']);
-            $("#1v1m").html(django_data['recent']['1v1m']);
-            $("#ffaq").html(django_data['recent']['ffaq']);
-            $("#ffam").html(django_data['recent']['ffam']);
+            const arrSum = arr => arr.reduce((a, b) => parseInt(a) + parseInt(b), 0);
+            console.log(arrSum(Object.values(django_data['recent'])) - django_data['recent']['age']);
+            if(arrSum(Object.values(django_data['recent'])) - parseInt(django_data['recent']['age']) === 0) {
+                $("#speech-bubble-queue").html(
+                    'Oh no, there is no one playing ranked!');
+                $("#speech-bubble-matches").html("<br />");
+            }
+            else {
+                $("#speech-bubble-queue").html(
+                    'There are <span class="numbers" id="1v1q">x</span> players \
+                    in <span class="type">1v1</span> queue<br /> \
+                    and <span class="numbers" id="ffaq">y</span> players \
+                    in <span class="type">FFA</span> queue.');
+                $("#speech-bubble-matches").html(
+                    'Currently there are <span class="numbers" id="1v1m">v</span> <span class="type">1v1</span> matches<br /> \
+                    and <span class="numbers" id="ffam">w</span> <span class="type">FFA</span> matches going on.');
+                $("#1v1q").html(django_data['recent']['1v1q']);
+                $("#1v1m").html(django_data['recent']['1v1m']);
+                $("#ffaq").html(django_data['recent']['ffaq']);
+                $("#ffam").html(django_data['recent']['ffam']);
+            }
+            $("#speech-bubble-time").html('*this status is based on the query made <span id="query_age">z</span> minutes ago*');
             $("#query_age").html(django_data['recent']['age']);
             createGraph('ffam');
         });
