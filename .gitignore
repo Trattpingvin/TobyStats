@@ -3,4 +3,5 @@ stats/migrations/*
 *.log
 *.kra
 *.kra~
+*.pyc
 db.sqlite3
