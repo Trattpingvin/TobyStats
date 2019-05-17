@@ -29,7 +29,7 @@ class ChartView(View):
         }
         return recent
 
-    def analyze_data(self, tz):
+    def analyze_data(self):
         result = {
             '1v1m': [],
             '1v1q': [],
@@ -41,23 +41,21 @@ class ChartView(View):
             data = csv.reader(f)
 
             for item in data:
-                local_zone = pytz.timezone(tz)
                 time_raw = item[0]
 
                 #timezone conversion
                 time_utc = convert_datestring_to_dateobj(time_raw)
-                time_loc = time_utc.astimezone(tz=local_zone)
 
-                result['1v1m'].append({'time': str(time_loc)[0:-6], 'val': item[1]})
-                result['1v1q'].append({'time': str(time_loc)[0:-6], 'val': item[2]})
-                result['ffam'].append({'time': str(time_loc)[0:-6], 'val': item[3]})
-                result['ffaq'].append({'time': str(time_loc)[0:-6], 'val': item[4]})
+                result['1v1m'].append({'time': str(time_utc)[0:-6], 'val': item[1]})
+                result['1v1q'].append({'time': str(time_utc)[0:-6], 'val': item[2]})
+                result['ffam'].append({'time': str(time_utc)[0:-6], 'val': item[3]})
+                result['ffaq'].append({'time': str(time_utc)[0:-6], 'val': item[4]})
 
             result['recent'] = self.get_recent_stats(item)
             print(result['ffam'][0]['time'])
             return result
 
 
-    def get(self, request, tz='UTC'):
-        data = self.analyze_data(tz)
+    def get(self, request):
+        data = self.analyze_data()
         return JsonResponse(data)

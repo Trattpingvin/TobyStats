@@ -39,23 +39,34 @@
 </div>
 
 <script>
-    function update_data(tz) {
-        let getUrl = "{% url 'tobystats:getdata' %}" + tz;
+    function update_data() {
+        let getUrl = "{% url 'tobystats:getdata' %}";
         $.get(getUrl, function(django_data) {
+            var parseDate = d3.timeParse("%Y-%m-%d %H:%M:%S");
+
+            for (var key in django_data){
+                if(django_data.hasOwnProperty(key))
+                {
+                    if(key==="recent") continue;
+                    django_data[key].map(d => {
+                        d.time = parseDate(d.time);
+                        d.val = +d.val;
+                });
+                }
+            }
+            window.graph_data = django_data;
             $("#1v1q").html(django_data['recent']['1v1q']);
             $("#1v1m").html(django_data['recent']['1v1m']);
             $("#ffaq").html(django_data['recent']['ffaq']);
             $("#ffam").html(django_data['recent']['ffam']);
             $("#query_age").html(django_data['recent']['age']);
-            createGraph(django_data);
+            createGraph('ffam');
         });
     };
 
     document.getElementById('refresh').addEventListener('click', function() {
-        update_data('UTC');
+        alert("not implemented");
     });
 
-    window.onload = function() {
-        update_data('UTC');
-    };
+    window.onload = update_data;
 </script>
