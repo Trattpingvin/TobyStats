@@ -39,31 +39,24 @@
 </div>
 
 <script>
-    function update_data(total, days, tz) {
-        let getUrl = "{% url 'tobystats:getdata' %}" + total + "/" + days + "/" + tz;
+    function update_data(tz) {
+        let getUrl = "{% url 'tobystats:getdata' %}" + tz;
         $.get(getUrl, function(django_data) {
-            window.chart_data = django_data;
-            window.day_data.datasets[0].data = window.chart_data['freq']['1v1'];
-            window.day_data.datasets[1].data = window.chart_data['freq']['FFA'];
-            window.time_data.datasets[0].data = window.chart_data['time']['1v1'];
-            window.time_data.datasets[1].data = window.chart_data['time']['FFA'];
-
-            window.day_chart.update();
-            window.time_chart.update();
+            console.log(django_data)
             $("#1v1q").html(django_data['recent']['1v1q']);
             $("#1v1m").html(django_data['recent']['1v1m']);
-            $("#FFAq").html(django_data['recent']['FFAq']);
-            $("#FFAm").html(django_data['recent']['FFAm']);
+            $("#ffaq").html(django_data['recent']['FFAq']);
+            $("#ffam").html(django_data['recent']['FFAm']);
             $("#query_age").html(django_data['recent']['age']);
-            buildMatchesGraph(django_data);
+            createGraph(django_data);
         });
     };
 
     document.getElementById('refresh').addEventListener('click', function() {
-        update_data('all', 30, 'UTC');
+        update_data('UTC');
     });
 
     window.onload = function() {
-        update_data('all', 30, 'UTC');
+        update_data('UTC');
     };
 </script>
