@@ -53,7 +53,6 @@
             }
             window.graph_data = django_data;
             const arrSum = arr => arr.reduce((a, b) => parseInt(a) + parseInt(b), 0);
-            console.log(arrSum(Object.values(django_data['recent'])) - django_data['recent']['age']);
             if(arrSum(Object.values(django_data['recent'])) - parseInt(django_data['recent']['age']) === 0) {
                 $("#speech-bubble-queue").html(
                     'Oh no, there is no one playing ranked!');
