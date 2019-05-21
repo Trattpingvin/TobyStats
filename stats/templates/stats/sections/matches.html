@@ -173,8 +173,22 @@
 			var d1 = new Date(middle - half_span);
 			var d2 = new Date(middle + half_span);
 			[maxleft, maxright] = x2.domain();
-			if(d1<maxleft) d1=maxleft;
-			if(d2>maxright) d2=maxright;
+			if(d1<maxleft)
+			{
+				var diff = maxleft.getTime()-d1.getTime();
+				d1 = new Date(maxleft);
+				d2.setTime(d2.getTime()+diff);
+			} 
+			if(d2>maxright)
+			{
+				var diff = d2.getTime()-maxright.getTime();
+				d2=maxright;
+				d1.setTime(d1.getTime()-diff);
+				if(d1<maxleft) 
+				{
+					d1=maxleft;
+				}
+			} 
 			x.domain([d1, d2]);
 			focus.select(".area").attr("d", area);
 			focus.select(".axis--x").call(xAxis);
