@@ -17,47 +17,18 @@ Time zone offset:
 	
 </select>
 <script>
-	
-	var tzoffsets = [
-	"UTC -12",
-	"UTC -11",
-	"UTC -10",
-	"UTC -9",
-	"UTC -8",
-	"UTC -7",
-	"UTC -6",
-	"UTC -5",
-	"UTC -4",
-	"UTC -3",
-	"UTC -2",
-	"UTC -1",
-	"UTC +0",
-	"UTC +1",
-	"UTC +2",
-	"UTC +3",
-	"UTC +4",
-	"UTC +5",
-	"UTC +6",
-	"UTC +7",
-	"UTC +8",
-	"UTC +9",
-	"UTC +10",
-	"UTC +11",
-	"UTC +12",
-	"UTC +13",
-	"UTC +14"
-	];
+
 	var tzselect = $("#tzselect");
 	var whyisnttimezoneoffsetastaticmethod = new Date();
-	if(localStorage.hasOwnProperty('tz')) chosen_tz = +localStorage['tz'];
-	else chosen_tz = Math.floor(whyisnttimezoneoffsetastaticmethod.getTimezoneOffset()/-60);
+	if(localStorage.hasOwnProperty('tz')) selected_tz = +localStorage['tz'];
+	else selected_tz = Math.floor(whyisnttimezoneoffsetastaticmethod.getTimezoneOffset()/-60);
 	for(i=-12;i<15;i++)
 	{
 		if(i<0) prepend = "";
 		else prepend = "+";
 		tzselect.append($("<option></option>").attr("value", i).text("UTC " + prepend+i));
 	}
-	tzselect.val(chosen_tz);
+	tzselect.val(selected_tz);
 	tzselect.change(function(){createGraph();});
 	
 	$(".button_creategraph").click(function()
@@ -76,8 +47,7 @@ Time zone offset:
 	
 	
 	function createGraph() {
-		
-		var parseDate = d3.utcParse("%Y-%m-%d %H:%M:%S");
+		var parseDate = d3.timeParse("%Y-%m-%d %H:%M:%S");
 		
 		$("svg").empty();
 		
