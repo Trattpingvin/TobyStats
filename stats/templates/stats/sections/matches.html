@@ -10,7 +10,55 @@
 	<button type="button" id="button_zoomday">Zoom to Day</button>
 	<button type="button" id="button_zoommonth">Zoom to Month</button>
 </div>
+Time zone offset:
+<select id="tzselect">
+	
+	
+	
+</select>
 <script>
+	
+	var tzoffsets = [
+	"UTC -12",
+	"UTC -11",
+	"UTC -10",
+	"UTC -9",
+	"UTC -8",
+	"UTC -7",
+	"UTC -6",
+	"UTC -5",
+	"UTC -4",
+	"UTC -3",
+	"UTC -2",
+	"UTC -1",
+	"UTC +0",
+	"UTC +1",
+	"UTC +2",
+	"UTC +3",
+	"UTC +4",
+	"UTC +5",
+	"UTC +6",
+	"UTC +7",
+	"UTC +8",
+	"UTC +9",
+	"UTC +10",
+	"UTC +11",
+	"UTC +12",
+	"UTC +13",
+	"UTC +14"
+	];
+	var tzselect = $("#tzselect");
+	var whyisnttimezoneoffsetastaticmethod = new Date();
+	if(localStorage.hasOwnProperty('tz')) chosen_tz = +localStorage['tz'];
+	else chosen_tz = Math.floor(whyisnttimezoneoffsetastaticmethod.getTimezoneOffset()/-60);
+	for(i=-12;i<15;i++)
+	{
+		if(i<0) prepend = "-";
+		else prepend = "+";
+		tzselect.append($("<option></option>").attr("value", i).text("UTC " + prepend+i));
+	}
+	tzselect.val(chosen_tz);
+	
 	$(".button_creategraph").click(function()
 	{
 		var buttons = Array.from(document.getElementsByClassName("button_creategraph"));
@@ -47,11 +95,11 @@
 		});
 		
 		var data_type = $(".button_creategraph.active").attr('data-matchtype');
-
+		
 		//data = window.graph_data[data_type];
 		data = get_storage_item('graph_data')[data_type];
 		if(data===null) alert("error storing data. lazy dev should implement a plan B");
-
+		
 		data.map(d => {
 			d.time = parseDate(d.time);
 			d.val = +d.val;
