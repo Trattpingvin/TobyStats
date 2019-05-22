@@ -98,12 +98,12 @@
             }
             $("#speech-bubble-time").html('*this status is based on the query made <span id="query_age">z</span> minutes ago*');
             $("#query_age").html(django_data['recent']['time']['age']);
-            createGraph('ffam');
+            createGraph();
         });
     };
     
     document.getElementById('refresh').addEventListener('click', function() {
-        alert("not implemented");
+        update_data();
     });
     
     window.onload = update_data;

@@ -13,9 +13,6 @@
 <script>
 	$(".button_creategraph").click(function()
 	{
-		console.log("clicked");
-		createGraph($(this).attr('data-matchtype'));
-		// set creategraph 
 		var buttons = Array.from(document.getElementsByClassName("button_creategraph"));
 		buttons.forEach(function(item) {
 			item.classList.remove("active");
@@ -23,12 +20,13 @@
 		});
 		$(this).addClass("active");
 		$(this).removeClass("inactive");
+		createGraph();
 	});
 	
 	
 	
 	
-	function createGraph(data_type='ffam') {
+	function createGraph() {
 		
 		var parseDate = d3.timeParse("%Y-%m-%d %H:%M:%S");
 		
@@ -48,6 +46,8 @@
 			zoomToFit(60*60*24*30);
 		});
 		
+		var data_type = $(".button_creategraph.active").attr('data-matchtype');
+
 		//data = window.graph_data[data_type];
 		data = get_storage_item('graph_data')[data_type];
 		if(data===null) alert("error storing data. lazy dev should implement a plan B");
