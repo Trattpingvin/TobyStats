@@ -36,51 +36,75 @@
 </div>
 
 <script>
-    function update_data() {
-        let getUrl = "{% url 'tobystats:getdata' %}";
-        $.get(getUrl, function(django_data) {
-            var parseDate = d3.timeParse("%Y-%m-%d %H:%M:%S");
+    function get_storage_item(key, default_val = null)
+    {
+        if(localStorage.hasOwnProperty(key)) return JSON.parse(localStorage[key]);
+        return default_val;
+    }
+    function set_storage_item(key, val)
+    {
+        localStorage[key] = JSON.stringify(val);
+    }
 
+    function update_data() {
+        var latest_data_timestamp = ""
+        var graph_data = get_storage_item('graph_data', {
+            '1v1m': [],
+            '1v1q': [],
+            'ffam': [],
+            'ffaq': []
+        });
+        if (graph_data.hasOwnProperty('recent')) latest_data_timestamp = graph_data['recent']['time']['timestamp'];
+        else latest_data_timestamp = "1970-04-20 22:33:00";
+        let getUrl = "{% url 'tobystats:getdata' %}"+latest_data_timestamp;
+        $.get(getUrl, function(django_data) {
             for (var key in django_data){
                 if(django_data.hasOwnProperty(key))
                 {
-                    if(key==="recent") continue;
-                    django_data[key].map(d => {
-                        d.time = parseDate(d.time);
-                        d.val = +d.val;
-                });
+                    if(key==="recent")
+                    {
+                        graph_data['recent'] = django_data[key];
+                    }
+                    else
+                    {
+                        django_data[key].map(d => {
+                            graph_data[key].push(d);
+                        });
+                    }
                 }
             }
-            window.graph_data = django_data;
+            //window.graph_data = django_data;
+            set_storage_item('graph_data', graph_data);
+            
             const arrSum = arr => arr.reduce((a, b) => parseInt(a) + parseInt(b), 0);
-            if(arrSum(Object.values(django_data['recent'])) - parseInt(django_data['recent']['age']) === 0) {
+            if(arrSum(Object.values(django_data['recent']['data'])) === 0) {
                 $("#speech-bubble-queue").html(
-                    'Oh no, there is no one playing ranked!');
+                'Oh no, there is no one playing ranked!');
                 $("#speech-bubble-matches").html("<br />");
             }
             else {
                 $("#speech-bubble-queue").html(
-                    'There are <span class="numbers" id="1v1q">x</span> players \
-                    in <span class="type">1v1</span> queue<br /> \
-                    and <span class="numbers" id="ffaq">y</span> players \
-                    in <span class="type">FFA</span> queue.');
+                'There are <span class="numbers" id="1v1q">x</span> players \
+                in <span class="type">1v1</span> queue<br /> \
+                and <span class="numbers" id="ffaq">y</span> players \
+                in <span class="type">FFA</span> queue.');
                 $("#speech-bubble-matches").html(
-                    'Currently there are <span class="numbers" id="1v1m">v</span> <span class="type">1v1</span> matches<br /> \
-                    and <span class="numbers" id="ffam">w</span> <span class="type">FFA</span> matches going on.');
-                $("#1v1q").html(django_data['recent']['1v1q']);
-                $("#1v1m").html(django_data['recent']['1v1m']);
-                $("#ffaq").html(django_data['recent']['ffaq']);
-                $("#ffam").html(django_data['recent']['ffam']);
+                'Currently there are <span class="numbers" id="1v1m">v</span> <span class="type">1v1</span> matches<br /> \
+                and <span class="numbers" id="ffam">w</span> <span class="type">FFA</span> matches going on.');
+                $("#1v1q").html(django_data['recent']['data']['1v1q']);
+                $("#1v1m").html(django_data['recent']['data']['1v1m']);
+                $("#ffaq").html(django_data['recent']['data']['ffaq']);
+                $("#ffam").html(django_data['recent']['data']['ffam']);
             }
             $("#speech-bubble-time").html('*this status is based on the query made <span id="query_age">z</span> minutes ago*');
-            $("#query_age").html(django_data['recent']['age']);
+            $("#query_age").html(django_data['recent']['time']['age']);
             createGraph('ffam');
         });
     };
-
+    
     document.getElementById('refresh').addEventListener('click', function() {
         alert("not implemented");
     });
-
+    
     window.onload = update_data;
 </script>
