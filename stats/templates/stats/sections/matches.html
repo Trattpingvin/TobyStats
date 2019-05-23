@@ -17,33 +17,33 @@ Time zone offset:
 	
 </select>
 <script>
-
-	var tzselect = $("#tzselect");
-	var whyisnttimezoneoffsetastaticmethod = new Date();
-	if(localStorage.hasOwnProperty('tz')) selected_tz = +localStorage['tz'];
-	else selected_tz = Math.floor(whyisnttimezoneoffsetastaticmethod.getTimezoneOffset()/-60);
-	for(i=-12;i<15;i++)
+	$(document).ready(function()
 	{
-		if(i<0) prepend = "";
-		else prepend = "+";
-		tzselect.append($("<option></option>").attr("value", i).text("UTC " + prepend+i));
-	}
-	tzselect.val(selected_tz);
-	tzselect.change(function(){createGraph();});
-	
-	$(".button_creategraph").click(function()
-	{
-		var buttons = Array.from(document.getElementsByClassName("button_creategraph"));
-		buttons.forEach(function(item) {
-			item.classList.remove("active");
-			item.classList.add("inactive");
+		var tzselect = $("#tzselect");
+		var whyisnttimezoneoffsetastaticmethod = new Date();
+		if(localStorage.hasOwnProperty('tz')) selected_tz = +localStorage['tz'];
+		else selected_tz = Math.floor(whyisnttimezoneoffsetastaticmethod.getTimezoneOffset()/-60);
+		for(i=-12;i<15;i++)
+		{
+			if(i<0) prepend = "";
+			else prepend = "+";
+			tzselect.append($("<option></option>").attr("value", i).text("UTC " + prepend+i));
+		}
+		tzselect.val(selected_tz);
+		tzselect.change(function(){createGraph();});
+		
+		$(".button_creategraph").click(function()
+		{
+			var buttons = Array.from(document.getElementsByClassName("button_creategraph"));
+			buttons.forEach(function(item) {
+				item.classList.remove("active");
+				item.classList.add("inactive");
+			});
+			$(this).addClass("active");
+			$(this).removeClass("inactive");
+			createGraph();
 		});
-		$(this).addClass("active");
-		$(this).removeClass("inactive");
-		createGraph();
 	});
-	
-	
 	
 	
 	function createGraph() {
@@ -69,10 +69,10 @@ Time zone offset:
 		
 		//data = window.graph_data[data_type];
 		data = get_storage_item('graph_data')[data_type];
-		if(data===null) alert("error storing data. lazy dev should implement a plan B");
+		if(data===null) alert("Error storing data, localStorage is not available. Try another browser");
 		
 		var tz_millisecond_offset = $("#tzselect").children("option:selected").val()*60*60*1000;
-
+		
 		data.map(d => {
 			d.time = parseDate(d.time);
 			if(tz_millisecond_offset!==0) d.time.setTime(d.time.getTime()+tz_millisecond_offset);
@@ -174,6 +174,7 @@ Time zone offset:
 		.attr("height", height)
 		.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 		.call(zoom);
+		
 		
 		function brushed() {
 			if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return; // ignore brush-by-zoom
