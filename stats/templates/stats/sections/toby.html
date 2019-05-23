@@ -1,8 +1,4 @@
 <!-- div section toby -->
-<div class="refresh" role="button">
-    <div id="refresh"></div>
-    Refresh Data
-</div>
 <div class="icon" role="img"></div>
 <div class="bubble">
     <table>
@@ -101,10 +97,6 @@
             createGraph();
         });
     };
-    
-    document.getElementById('refresh').addEventListener('click', function() {
-        update_data();
-    });
     
     window.onload = update_data;
 </script>
