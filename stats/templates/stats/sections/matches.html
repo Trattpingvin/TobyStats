@@ -30,9 +30,8 @@ Time zone offset:
 			tzselect.append($("<option></option>").attr("value", i).text("UTC " + prepend+i));
 		}
 		tzselect.val(selected_tz);
-		tzselect.change(function(){createGraph();});
-		
-		$(".button_creategraph").click(function()
+	});
+	$(".button_creategraph").click(function()
 		{
 			var buttons = Array.from(document.getElementsByClassName("button_creategraph"));
 			buttons.forEach(function(item) {
@@ -43,12 +42,31 @@ Time zone offset:
 			$(this).removeClass("inactive");
 			createGraph();
 		});
-	});
-	
 	
 	function createGraph() {
-		var parseDate = d3.timeParse("%Y-%m-%d %H:%M:%S");
+		var parseDate = d3.utcParse("%Y-%m-%d %H:%M:%S%Z");
+		var timezoneOffset = 0;
+		$("#tzselect").off('change');
+		$("#tzselect").change(updateDomain);
+
+		function updateDomain()
+		{
+			var newOffset = $("#tzselect").children("option:selected").val()*60*60*1000;
+			data.map(function(d)
+			{
+				d.time.setTime(d.time.getTime()-timezoneOffset+newOffset);
+			});
+			x2.domain(d3.extent(data, function(d) { return d.time; }));
+			[d1, d2] = x.domain();
+			x.domain([d1.setTime(d1.getTime()-timezoneOffset+newOffset), d2.setTime(d2.getTime()-timezoneOffset+newOffset)]);
+			focus.select(".area").attr("d", area);
+			focus.select(".axis--x").call(xAxis);
+			timezoneOffset = newOffset;
+
+		}
 		
+		
+
 		$("svg").empty();
 		
 		$("#button_zoomday").off();
@@ -64,20 +82,20 @@ Time zone offset:
 		{
 			zoomToFit(60*60*24*30);
 		});
-		
+
 		var data_type = $(".button_creategraph.active").attr('data-matchtype');
 		
 		//data = window.graph_data[data_type];
 		data = get_storage_item('graph_data')[data_type];
 		if(data===null) alert("Error storing data, localStorage is not available. Try another browser");
 		
-		var tz_millisecond_offset = $("#tzselect").children("option:selected").val()*60*60*1000;
 		
 		data.map(d => {
-			d.time = parseDate(d.time);
-			if(tz_millisecond_offset!==0) d.time.setTime(d.time.getTime()+tz_millisecond_offset);
+			d.time = parseDate(d.time+"+0000");
 			d.val = +d.val;
 		});
+
+		
 		
 		var svg = d3.select("svg"),
 		margin = {top: 20, right: 20, bottom: 110, left: 40},
@@ -87,8 +105,8 @@ Time zone offset:
 		height2 = +svg.attr("height") - margin2.top - margin2.bottom;
 		
 		
-		var x = d3.scaleTime().range([0, width]),
-		x2 = d3.scaleTime().range([0, width]),
+		var x = d3.scaleUtc().range([0, width]),
+		x2 = d3.scaleUtc().range([0, width]),
 		y = d3.scaleLinear().range([height, 0]),
 		y2 = d3.scaleLinear().range([height2, 0]);
 		
@@ -174,6 +192,9 @@ Time zone offset:
 		.attr("height", height)
 		.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 		.call(zoom);
+		
+		
+		updateDomain();
 		
 		
 		function brushed() {
