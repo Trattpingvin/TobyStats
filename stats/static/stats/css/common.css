@@ -5,7 +5,6 @@
 }
 
 main {
-  min-height: calc(100vh - 55px);
   width: 840px;
   margin: auto;
   padding-top: 10px;
@@ -16,7 +15,6 @@ body {
   position: relative;
   margin: 0;
   padding: 0;
-  min-height: 100%;
 }
 
 header, footer {
@@ -24,7 +22,7 @@ header, footer {
   margin-left: auto;
   margin-right: auto;
   text-align: center;
-  background-color: #1B2D2D;
+  background-color: #2C4647;
 }
 
 header {
@@ -47,7 +45,7 @@ footer h2 {
 }
 
 footer a {
-  color: greenyellow;
+  color: #ABFE2D;
   text-decoration: none;
   transition: 0.3s;
 }
@@ -69,6 +67,11 @@ h2 {
   font-size: 1em;
 }
 
+.wrapper {
+  margin-bottom: 10px;
+  overflow: auto;
+}
+
 .wrapper .graph-days {
   float: left;
   width: 48%;
@@ -77,110 +80,4 @@ h2 {
 .wrapper .graph-time {
   float: right;
   width: 48%;
-}
-
-.section {
-  border: solid 1px green;
-  margin-top: 20px;
-  padding: 5px;
-}
-
-.toby {
-  overflow: auto;
-  position: relative;
-  background: linear-gradient(to bottom, #2C4647 77%, #243A3B 77% 82%, #1B2D2D 82%);
-  padding-left: 0;
-  padding-right: 0;
-  padding-bottom: 0;
-}
-
-.toby .icon {
-  position: absolute;
-  width: 256px;
-  height: 256px;
-  background-image: url("../img/Toby-enlarged-tp.png");
-  bottom: 0;
-}
-
-.toby .bubble {
-  display: table;
-  position: relative;
-  float: right;
-  margin-top: 10px;
-  margin-right: 30px;
-  margin-bottom: 30px;
-  width: 559px;
-  height: 322px;
-  background-image: url("../img/bubble.png");
-}
-
-.toby .bubble table {
-  display: table;
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  padding-top: 30px;
-  padding-left: 40px;
-  padding-right: 40px;
-  padding-bottom: 70px;
-  font-family: Belwe;
-  text-align: center;
-}
-
-.toby .bubble table thead tr {
-  font-size: 1.8em;
-}
-
-.toby .bubble table tbody {
-  font-size: 1.4em;
-}
-
-.toby .bubble table tbody .numbers {
-  color: green;
-}
-
-.toby .bubble table tbody .type {
-  color: brown;
-}
-
-.toby .extra {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  padding-right: 25px;
-  padding-bottom: 10px;
-  font-family: Belwe;
-  color: lightgrey;
-}
-
-.toby .refresh {
-  position: absolute;
-  left: 20px;
-  top: 20px;
-  color: white;
-  font-family: Belwe;
-  font-size: 14px;
-}
-
-.toby .refresh #refresh {
-  background: no-repeat url("../img/refresh.png");
-  background-size: cover;
-  width: 60px;
-  height: 60px;
-  cursor: pointer;
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 5px;
-}
-
-canvas {
-  -moz-user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-}
-
-.graph-matches button {
-  background-color: gold;
 }

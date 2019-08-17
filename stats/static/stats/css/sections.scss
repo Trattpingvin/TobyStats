@@ -1,0 +1,174 @@
+// ---------------- Variables ------------------
+$width: 840px;
+
+$color-green: #83D721;
+$color-green-light: #ABFE2D;
+$color-green-darker: #1B2D2D;
+$color-green-darke: #243A3B;
+$color-green-dark: #2C4647;
+$color-green-lush: #56a002;
+$color-green-white: #E1FBC3;
+
+$color-blueish: #1B7993;
+$color-blueish-hover: rgb(48, 145, 172);
+$color-blueish-darker: #001216;
+$color-blueish-dark: #054F64;
+$color-blueish-dark-hover: #0C657E;
+$color-blueish-light: #4D9CB3;
+$color-blueish-white: #BCE4EF;
+
+// ----------------- Sections ------------------
+
+.section {
+    border: solid 1px green;
+    margin-top: 20px;
+    padding: 5px;
+  }
+  
+  
+  .toby {
+    overflow:auto;
+    position: relative;
+    background: linear-gradient(to bottom, $color-green-dark 77%, $color-green-darke 77% 82%, $color-green-darker 82%);
+    padding: {
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+  
+    .icon {
+      position: absolute;
+      width: 256px;
+      height: 256px;
+      background-image: url("../img/Toby-enlarged-tp.png");
+      bottom: 0;
+    }
+  
+    .bubble {
+      display: table;
+      position: relative;
+      float:right;
+      margin-top: 10px;
+      margin-right: 30px;
+      margin-bottom: 30px;
+      width: 559px;
+      height:322px;
+      background-image: url("../img/bubble.png");
+  
+      table {
+        // location and size
+        display: table;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+  
+        padding: {
+          top: 30px;
+          left: 40px;
+          right: 40px;
+          bottom: 70px;
+        }
+  
+        // contents
+        font-family: Belwe;
+        text-align: center;
+        thead tr {font-size: 1.8em;}
+        tbody {
+          font-size: 1.4em;
+          .numbers {color: green;}
+          .type {color: brown;}
+        }
+      }
+    }
+  
+    .extra {
+      position:absolute;
+      right: 0;
+      bottom: 0;
+  
+      padding: {
+        right: 25px;
+        bottom: 10px;
+      }
+      font-family: Belwe;
+      color: lightgrey;
+    }
+  
+    .refresh {
+      position: absolute;
+      left: 20px;
+      top: 20px;
+      color: white;
+      font-family: Belwe;
+      font-size: 14px;
+  
+      #refresh {
+        background: no-repeat url("../img/refresh.png");
+        background-size: cover;
+        width: 60px;
+        height: 60px;
+        cursor: pointer;
+        margin: {
+          left: auto;
+          right: auto;
+          bottom: 5px;
+        }
+      }
+    }
+  }
+
+  .graph-big {
+    padding: 0;
+
+    svg.graph {
+        //border: solid 3px $color-green-lush;
+        .area {
+		fill: steelblue;
+		clip-path: url(#clip);
+        }
+
+        .zoom {
+            cursor: move;
+            fill: none;
+            pointer-events: all;
+        }
+    }
+    .button-wrapper.create {
+        margin-top: -1px; // temporary, remove if default border is removed.
+
+        background: $color-green-dark;
+        button {
+            margin: {
+                left: 10px;
+                right: 10px;
+            }
+            padding: {
+                top: 5px;
+                bottom: 8px;
+            }
+            background-color: rgba(0,0,0,0);
+            color: rgb(211, 211, 211);
+            font-family: Belwe;
+            font-size: 1.2em;
+
+            border: {
+                bottom: solid 3px rgba(0,0,0,0);
+                top: solid 3px rgba(0,0,0,0);
+                left: none;
+                right: none;
+            }
+            
+            &.active {
+                border-color: $color-green;
+                color: white;
+            }
+
+            &.inactive:hover {
+                border-color: $color-green-lush;
+                color: rgb(240, 240, 240);
+            }
+        }
+    }
+  }

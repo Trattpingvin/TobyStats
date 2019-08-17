@@ -1,8 +1,4 @@
 <!-- div section toby -->
-<div class="refresh" role="button">
-    <div id="refresh"></div>
-    Refresh Data
-</div>
 <div class="icon" role="img"></div>
 <div class="bubble">
     <table>
@@ -16,53 +12,91 @@
         </thead>
         <tbody>
             <tr>
-                <td>
+                <td id="speech-bubble-queue">
                     <!-- No one is waiting in queue. -->
-                    There are <span class="numbers" id="1v1q">x</span> players
-                    in <span class="type">1v1</span> queue<br />
-                    and <span class="numbers" id="FFAq">y</span> players
-                    in <span class="type">FFA</span> queue.
+                    <br />
+                    Please wait, I am digging up the data...
                 </td>
             </tr>
             <tr>
-                <td>
+                <td id="speech-bubble-matches">
                     <!-- There are no matches going on right now.-->
-                    Currently there are <span class="numbers" id="1v1m">v</span> <span class="type">1v1</span> matches<br />
-                    and <span class="numbers" id="FFAm">w</span> <span class="type">FFA</span> matches going on.
+                    <br /><br />
                 </td>
             </tr>
         </tbody>
     </table>
-    <div class="extra">
-        *this status is based on the query made <span id="query_age">z</span> minutes ago*
+    <div class="extra" id="speech-bubble-time">
+        *
     </div>
 </div>
 
 <script>
-    function update_data(total, days, tz) {
-        let getUrl = "{% url 'tobystats:getdata' %}" + total + "/" + days + "/" + tz;
-        $.get(getUrl, function(django_data) {
-            window.chart_data = django_data;
-            window.day_data.datasets[0].data = window.chart_data['freq']['1v1'];
-            window.day_data.datasets[1].data = window.chart_data['freq']['FFA'];
-            window.time_data.datasets[0].data = window.chart_data['time']['1v1'];
-            window.time_data.datasets[1].data = window.chart_data['time']['FFA'];
+    function get_storage_item(key, default_val = null)
+    {
+        if(localStorage.hasOwnProperty(key)) return JSON.parse(localStorage[key]);
+        return default_val;
+    }
+    function set_storage_item(key, val)
+    {
+        localStorage[key] = JSON.stringify(val);
+    }
 
-            window.day_chart.update();
-            window.time_chart.update();
-            $("#1v1q").html(django_data['recent']['1v1q']);
-            $("#1v1m").html(django_data['recent']['1v1m']);
-            $("#FFAq").html(django_data['recent']['FFAq']);
-            $("#FFAm").html(django_data['recent']['FFAm']);
-            $("#query_age").html(django_data['recent']['age']);
+    function update_data() {
+        var latest_data_timestamp = ""
+        var graph_data = get_storage_item('graph_data', {
+            '1v1m': [],
+            '1v1q': [],
+            'ffam': [],
+            'ffaq': []
+        });
+        if (graph_data.hasOwnProperty('recent')) latest_data_timestamp = graph_data['recent']['time']['timestamp'];
+        else latest_data_timestamp = "1970-04-20 22:33:00";
+        let getUrl = "{% url 'tobystats:getdata' %}"+latest_data_timestamp;
+        $.get(getUrl, function(django_data) {
+            for (var key in django_data){
+                if(django_data.hasOwnProperty(key))
+                {
+                    if(key==="recent")
+                    {
+                        graph_data['recent'] = django_data[key];
+                    }
+                    else
+                    {
+                        django_data[key].map(d => {
+                            graph_data[key].push(d);
+                        });
+                    }
+                }
+            }
+            //window.graph_data = django_data;
+            set_storage_item('graph_data', graph_data);
+            
+            const arrSum = arr => arr.reduce((a, b) => parseInt(a) + parseInt(b), 0);
+            if(arrSum(Object.values(django_data['recent']['data'])) === 0) {
+                $("#speech-bubble-queue").html(
+                'Oh no, there is no one playing ranked!');
+                $("#speech-bubble-matches").html("<br />");
+            }
+            else {
+                $("#speech-bubble-queue").html(
+                'There are <span class="numbers" id="1v1q">x</span> players \
+                in <span class="type">1v1</span> queue<br /> \
+                and <span class="numbers" id="ffaq">y</span> players \
+                in <span class="type">FFA</span> queue.');
+                $("#speech-bubble-matches").html(
+                'Currently there are <span class="numbers" id="1v1m">v</span> <span class="type">1v1</span> matches<br /> \
+                and <span class="numbers" id="ffam">w</span> <span class="type">FFA</span> matches going on.');
+                $("#1v1q").html(django_data['recent']['data']['1v1q']);
+                $("#1v1m").html(django_data['recent']['data']['1v1m']);
+                $("#ffaq").html(django_data['recent']['data']['ffaq']);
+                $("#ffam").html(django_data['recent']['data']['ffam']);
+            }
+            $("#speech-bubble-time").html('*this status is based on the query made <span id="query_age">z</span> minutes ago*');
+            $("#query_age").html(django_data['recent']['time']['age']);
+            createGraph();
         });
     };
-
-    document.getElementById('refresh').addEventListener('click', function() {
-        update_data('all', 30, 'UTC');
-    });
-
-    window.onload = function() {
-        update_data('all', 30, 'UTC');
-    };
+    
+    window.onload = update_data;
 </script>

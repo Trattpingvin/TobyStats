@@ -1,5 +1,252 @@
-<!-- this part should have timezone and range selector 
-    user choose options, hit apply, which will refresh all the carts.
-    default is "partial", 30, "UTC"
-    can choose "all", <int>, "US/Eastern" "US/Central" EST and stuff.
--->
+<meta charset="utf-8">
+<div class="button-wrapper create" id="datasetchoosers">
+	<button type="button" class="button_creategraph inactive" data-matchtype="ffaq">FFA Queue</button>
+	<button type="button" class="button_creategraph active" data-matchtype="ffam">FFA Matches</button>
+	<button type="button" class="button_creategraph inactive" data-matchtype="1v1q">1v1 Queue</button>
+	<button type="button" class="button_creategraph inactive" data-matchtype="1v1m">1v1 Matches</button>
+</div>
+<svg width="834" height="500" class="graph"></svg>
+<div class="button-wrapper zoom" id="zoomhelpers">
+	<button type="button" id="button_zoomday">Zoom to Day</button>
+	<button type="button" id="button_zoommonth">Zoom to Month</button>
+</div>
+Time zone offset:
+<select id="tzselect">
+	
+	
+	
+</select>
+<script>
+	$(document).ready(function()
+	{
+		var tzselect = $("#tzselect");
+		var whyisnttimezoneoffsetastaticmethod = new Date();
+		if(localStorage.hasOwnProperty('tz')) selected_tz = +localStorage['tz'];
+		else selected_tz = Math.floor(whyisnttimezoneoffsetastaticmethod.getTimezoneOffset()/-60);
+		for(i=-12;i<15;i++)
+		{
+			if(i<0) prepend = "";
+			else prepend = "+";
+			tzselect.append($("<option></option>").attr("value", i).text("UTC " + prepend+i));
+		}
+		tzselect.val(selected_tz);
+	});
+	$(".button_creategraph").click(function()
+		{
+			var buttons = Array.from(document.getElementsByClassName("button_creategraph"));
+			buttons.forEach(function(item) {
+				item.classList.remove("active");
+				item.classList.add("inactive");
+			});
+			$(this).addClass("active");
+			$(this).removeClass("inactive");
+			createGraph();
+		});
+	
+	function createGraph() {
+		var parseDate = d3.utcParse("%Y-%m-%d %H:%M:%S%Z");
+		var timezoneOffset = 0;
+		$("#tzselect").off('change');
+		$("#tzselect").change(updateDomain);
+
+		function updateDomain()
+		{
+			var newOffset = $("#tzselect").children("option:selected").val()*60*60*1000;
+			data.map(function(d)
+			{
+				d.time.setTime(d.time.getTime()-timezoneOffset+newOffset);
+			});
+			x2.domain(d3.extent(data, function(d) { return d.time; }));
+			[d1, d2] = x.domain();
+			x.domain([d1.setTime(d1.getTime()-timezoneOffset+newOffset), d2.setTime(d2.getTime()-timezoneOffset+newOffset)]);
+			focus.select(".area").attr("d", area);
+			focus.select(".axis--x").call(xAxis);
+			timezoneOffset = newOffset;
+
+		}
+		
+		
+
+		$("svg").empty();
+		
+		$("#button_zoomday").off();
+		$("#button_zoomday").on("click",
+		function()
+		{
+			zoomToFit(60*60*24);
+		});
+		
+		$("#button_zoommonth").off();
+		$("#button_zoommonth").on("click",
+		function()
+		{
+			zoomToFit(60*60*24*30);
+		});
+
+		var data_type = $(".button_creategraph.active").attr('data-matchtype');
+		
+		//data = window.graph_data[data_type];
+		data = get_storage_item('graph_data')[data_type];
+		if(data===null) alert("Error storing data, localStorage is not available. Try another browser");
+		
+		
+		data.map(d => {
+			d.time = parseDate(d.time+"+0000");
+			d.val = +d.val;
+		});
+
+		
+		
+		var svg = d3.select("svg"),
+		margin = {top: 20, right: 20, bottom: 110, left: 40},
+		margin2 = {top: 430, right: 20, bottom: 30, left: 40},
+		width = +svg.attr("width") - margin.left - margin.right,
+		height = +svg.attr("height") - margin.top - margin.bottom,
+		height2 = +svg.attr("height") - margin2.top - margin2.bottom;
+		
+		
+		var x = d3.scaleUtc().range([0, width]),
+		x2 = d3.scaleUtc().range([0, width]),
+		y = d3.scaleLinear().range([height, 0]),
+		y2 = d3.scaleLinear().range([height2, 0]);
+		
+		var xAxis = d3.axisBottom(x),
+		xAxis2 = d3.axisBottom(x2),
+		yAxis = d3.axisLeft(y);
+		
+		var brush = d3.brushX()
+		.extent([[0, 0], [width, height2]])
+		.on("brush end", brushed);
+		
+		var zoom = d3.zoom()
+		.scaleExtent([1, Infinity])
+		.translateExtent([[0, 0], [width, height]])
+		.extent([[0, 0], [width, height]])
+		.on("zoom", zoomed);
+		
+		var area = d3.area()
+		.curve(d3.curveMonotoneX)
+		.x(function(d) { return x(d.time); })
+		.y0(height)
+		.y1(function(d) { return y(d.val); });
+		
+		var area2 = d3.area()
+		.curve(d3.curveMonotoneX)
+		.x(function(d) { return x2(d.time); })
+		.y0(height2)
+		.y1(function(d) { return y2(d.val); });
+		
+		svg.append("defs").append("clipPath")
+		.attr("id", "clip")
+		.append("rect")
+		.attr("width", width)
+		.attr("height", height);
+		
+		var focus = svg.append("g")
+		.attr("class", "focus")
+		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+		
+		var context = svg.append("g")
+		.attr("class", "context")
+		.attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
+		
+		
+		
+		x.domain(d3.extent(data, function(d) { return d.time; }));
+		y.domain([0, d3.max(data, function(d) { return d.val; })]);
+		x2.domain(x.domain());
+		y2.domain(y.domain());
+		
+		focus.append("path")
+		.datum(data)
+		.attr("class", "area")
+		.attr("d", area);
+		
+		focus.append("g")
+		.attr("class", "axis axis--x")
+		.attr("transform", "translate(0," + height + ")")
+		.call(xAxis);
+		
+		focus.append("g")
+		.attr("class", "axis axis--y")
+		.call(yAxis);
+		
+		context.append("path")
+		.datum(data)
+		.attr("class", "area")
+		.attr("d", area2);
+		
+		context.append("g")
+		.attr("class", "axis axis--x")
+		.attr("transform", "translate(0," + height2 + ")")
+		.call(xAxis2);
+		
+		context.append("g")
+		.attr("class", "brush")
+		.call(brush)
+		.call(brush.move, x.range());
+		
+		svg.append("rect")
+		.attr("class", "zoom")
+		.attr("width", width)
+		.attr("height", height)
+		.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+		.call(zoom);
+		
+		
+		updateDomain();
+		
+		
+		function brushed() {
+			if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return; // ignore brush-by-zoom
+			var s = d3.event.selection || x2.range();
+			x.domain(s.map(x2.invert, x2));
+			focus.select(".area").attr("d", area);
+			focus.select(".axis--x").call(xAxis);
+			svg.select(".zoom").call(zoom.transform, d3.zoomIdentity
+			.scale(width / (s[1] - s[0]))
+			.translate(-s[0], 0));
+		}
+		
+		function zoomed() {
+			if (d3.event.sourceEvent && d3.event.sourceEvent.type === "brush") return; // ignore zoom-by-brush
+			var t = d3.event.transform;
+			var trescaled = t.rescaleX(x2);
+			var newdomain = trescaled.domain();
+			x.domain(newdomain);
+			focus.select(".area").attr("d", area);
+			focus.select(".axis--x").call(xAxis);
+			context.select(".brush").call(brush.move, x.range().map(t.invertX, t));
+		}
+		
+		function zoomToFit(timespan_seconds)
+		{
+			[left, right] = x.domain();
+			var middle = left.getTime()/2 + right.getTime()/2;
+			var half_span = timespan_seconds*1000/2;
+			var d1 = new Date(middle - half_span);
+			var d2 = new Date(middle + half_span);
+			[maxleft, maxright] = x2.domain();
+			if(d1<maxleft)
+			{
+				var diff = maxleft.getTime()-d1.getTime();
+				d1 = new Date(maxleft);
+				d2.setTime(d2.getTime()+diff);
+			} 
+			if(d2>maxright)
+			{
+				var diff = d2.getTime()-maxright.getTime();
+				d2=maxright;
+				d1.setTime(d1.getTime()-diff);
+				if(d1<maxleft) 
+				{
+					d1=maxleft;
+				}
+			} 
+			x.domain([d1, d2]);
+			focus.select(".area").attr("d", area);
+			focus.select(".axis--x").call(xAxis);
+			context.select(".brush").call(brush.move, [x2(d1), x2(d2)]);
+		}
+	}
+</script>
